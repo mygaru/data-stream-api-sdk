@@ -1,0 +1,12 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "plugins": ["commitlint-plugin-regex-match"],
+  "rules": {
+    "subject-case": [0],
+    "body-match": [
+      2,
+      "always",
+      "^(build|ci|chore|docs|feat|fix|pref|refactor|revert|style|test)\\([A-Z]{2,3}-[\\d]+\\):"
+    ]
+  }
+}

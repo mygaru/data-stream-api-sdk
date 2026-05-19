@@ -1,0 +1,43 @@
+{
+  "name": "@mygaru/data-stream-api-sdk",
+  "version": "0.0.1",
+  "description": "myGaru Data Stream API integration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist"],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "biome check src --write",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
+    "prepublishOnly": "yarn clean && yarn typecheck && yarn lint && yarn build",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "data stream api",
+    "analytics",
+    "sdk"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@commitlint/cli": "17.6.7",
+    "@commitlint/config-conventional": "17.6.7",
+    "commitlint-plugin-regex-match": "1.2.4",
+    "husky": "^9.1.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}
