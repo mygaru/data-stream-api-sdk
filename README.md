@@ -4,34 +4,14 @@ The myGaru Data Stream API is a mechanism provided to myGaru partners for collec
 
 **Requirements:** Node.js ≥ 20.
 
-## Install
+## Init
 
-```bash
-# npm
-npm install @mygaru/data-stream-api-sdk
-
-# Yarn
-yarn add @mygaru/data-stream-api-sdk
-```
-
-or use the init script in the `<head>`
+use the init script in the `<head>`
 ```bash
 <script>(function(w,d,n,u,c){var t=w[n]||{};t.q=t.q||[];w[n]=new Proxy(t,{get:function(o,k){if(k==="q")return o.q;if(k==="then"||typeof k==="symbol"||k==="Error")return;if(Object.prototype.hasOwnProperty.call(o,k))return o[k];return function(){var a=[k];for(var i=0;i<arguments.length;i++)a.push(arguments[i]);o.q.push(a);}}});var e=d.createElement("script");e.async=true;e.src=u;e.onload=function(){w[n].init(c);};var f=d.getElementsByTagName("script")[0];f.parentNode.insertBefore(e,f);})(window,document,"DataStreamApiClient","https://dsalib.mgaru.dev/browser.global.js",{baseUrl:"https://[client_id].signals.mygaru.com"});</script>
 ```
 
 ## Quick start
-
-ESM
-```typescript
-import { DataStreamApiClient } from "@mygaru/data-stream-api-sdk";
-
-const dsClient = new DataStreamApiClient({ baseUrl: "https://[client_id].signals.mygaru.com" });
-
-await dsClient.setText("destinations_of_interest", "France,Greece");
-
-```
-
-IIFE
 
 ```typescript
 await window.DataStreamApiClient.setText("destinations_of_interest", "France,Greece");
@@ -75,12 +55,3 @@ await dsClient.stepNum("electronics_page_views", 1);
 ```typescript
 await dsClient.setBool("abandoned_cart", true);
 ```
-
-## Scripts
-| Script | Command | Description |
-| --- | --- | --- |
-| `build` | `tsup` | Builds `dist/index.js` (ESM) and `dist/browser.global.js` (IIFE). |
-| `typecheck` | `tsc --noEmit` + `tsc -p tsconfig.node.json` | Validates TypeScript without emitting files. |
-| `lint` | `biome check src --write` | Runs Biome linter/formatter. |
-| `clean` | `rm -rf dist` | Deletes the build output directory. |
-| `prepublishOnly` | `clean` → `typecheck` → `lint` → `build` | Runs automatically before `npm publish`. |
