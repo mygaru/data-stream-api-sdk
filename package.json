@@ -22,7 +22,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --minify",
     "lint": "biome check src --write",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
