@@ -38,7 +38,7 @@ await window.DataStreamApiClient.setText("destinations_of_interest", "France,Gre
 ```
 
 
-
+## Operations
 
 
 ### Text operations
