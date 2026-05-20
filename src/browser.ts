@@ -1,14 +1,6 @@
 import { DataStreamApiClient } from './services/client';
 import { DataStreamApiError } from './services/errors';
-import type { DataStreamApi, DataStreamApiConfig } from './types';
-
-type CommandQueueEntry = ArrayLike<unknown>;
-type CommandQueue = { q?: CommandQueueEntry[] };
-
-interface BrowserDataStreamApi extends DataStreamApi {
-  init(config: DataStreamApiConfig): DataStreamApiClient;
-  Error: typeof DataStreamApiError;
-}
+import type { BrowserDataStreamApi, CommandQueue, CommandQueueEntry } from './types';
 
 let instance: DataStreamApiClient | null = null;
 
@@ -76,12 +68,6 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
   },
   Error: DataStreamApiError,
 };
-
-declare global {
-  interface Window {
-    DataStreamApiClient?: BrowserDataStreamApi;
-  }
-}
 
 if (typeof window !== 'undefined') {
   const existing = window.DataStreamApiClient as (BrowserDataStreamApi & CommandQueue) | undefined;
