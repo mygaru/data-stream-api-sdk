@@ -44,7 +44,7 @@ export class DataStreamApiClient implements DataStreamApi {
     return await this.requestClient.get('/set-label', {
       otp,
       name: fieldName,
-      label: value,
+      label: value.trim(),
     });
   }
 
@@ -70,7 +70,7 @@ export class DataStreamApiClient implements DataStreamApi {
     return await this.requestClient.get('/add-label', {
       otp,
       name: fieldName,
-      label: value,
+      label: value.trim(),
     });
   }
 

@@ -1,6 +1,6 @@
 import { DataStreamApiError } from '../services/errors';
 
-const FIELD_NAME_PATTERN = /^[a-zA-Z0-9_]+$/;
+const FIELD_NAME_PATTERN = /^[A-Za-z ]+$/;
 
 export const normalizeBaseUrl = (url: string): string => {
   const baseUrl = url.trim();
@@ -31,7 +31,7 @@ export const validateFieldName = (name: string): string => {
   if (trimmed === '' || !FIELD_NAME_PATTERN.test(trimmed)) {
     throw new DataStreamApiError(
       'VALIDATION_ERROR',
-      'Field name must be non-empty and contain only alphanumeric characters of the English alphabet and the underscore character',
+      'Field name must be a non-empty string containing only Latin characters and spaces',
     );
   }
 
