@@ -32,10 +32,10 @@ export class DataStreamApiClient implements DataStreamApi {
   async setText(name: string, value: string): Promise<void> {
     const fieldName = validateFieldName(name);
 
-    if (typeof value !== 'string' || value.trim() === '') {
+    if (typeof value !== 'string') {
       throw new DataStreamApiError(
         'VALIDATION_ERROR',
-        'Invalid value for setText - expected a non-empty string',
+        'Invalid value for setText - expected a string',
       );
     }
 
@@ -48,20 +48,20 @@ export class DataStreamApiClient implements DataStreamApi {
     });
   }
 
-  async addText(name: string, value: string, delimiter: string): Promise<void> {
+  async addText(name: string, value: string, delimiter?: string): Promise<void> {
     const fieldName = validateFieldName(name);
 
-    if (typeof value !== 'string') {
+    if (typeof value !== 'string' || (typeof value === 'string' && value.trim() === '')) {
       throw new DataStreamApiError(
         'VALIDATION_ERROR',
-        'Invalid value for addText - expected a string',
+        'Invalid value for addText - expected a non-empty string',
       );
     }
 
-    if (typeof delimiter !== 'string' || delimiter.length === 0) {
+    if (delimiter !== undefined && typeof delimiter !== 'string') {
       throw new DataStreamApiError(
         'VALIDATION_ERROR',
-        'Invalid delimiter for addText - expected a non-empty string',
+        'Invalid delimiter for addText - expected a string',
       );
     }
 
