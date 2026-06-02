@@ -1,6 +1,6 @@
 interface DataStreamApi {
     setText(name: string, value: string): Promise<void>;
-    addText(name: string, value: string, delimiter: string): Promise<void>;
+    addText(name: string, value: string): Promise<void>;
     setNum(name: string, value: number): Promise<void>;
     stepNum(name: string, step: number): Promise<void>;
     setBool(name: string, value: boolean): Promise<void>;
@@ -31,7 +31,7 @@ declare class DataStreamApiClient implements DataStreamApi {
     constructor(config: DataStreamApiConfig);
     private resolveOtp;
     setText(name: string, value: string): Promise<void>;
-    addText(name: string, value: string, delimiter?: string): Promise<void>;
+    addText(name: string, value: string): Promise<void>;
     setNum(name: string, value: number): Promise<void>;
     stepNum(name: string, step: number): Promise<void>;
     setBool(name: string, value: boolean): Promise<void>;

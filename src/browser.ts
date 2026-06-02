@@ -54,8 +54,8 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
   setText(name, value) {
     return getDataStreamApiClient().setText(name, value);
   },
-  addText(name, value, delimiter) {
-    return getDataStreamApiClient().addText(name, value, delimiter);
+  addText(name, value) {
+    return getDataStreamApiClient().addText(name, value);
   },
   setNum(name, value) {
     return getDataStreamApiClient().setNum(name, value);

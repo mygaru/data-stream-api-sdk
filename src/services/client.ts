@@ -48,20 +48,13 @@ export class DataStreamApiClient implements DataStreamApi {
     });
   }
 
-  async addText(name: string, value: string, delimiter?: string): Promise<void> {
+  async addText(name: string, value: string): Promise<void> {
     const fieldName = validateFieldName(name);
 
     if (typeof value !== 'string' || (typeof value === 'string' && value.trim() === '')) {
       throw new DataStreamApiError(
         'VALIDATION_ERROR',
         'Invalid value for addText - expected a non-empty string',
-      );
-    }
-
-    if (delimiter !== undefined && typeof delimiter !== 'string') {
-      throw new DataStreamApiError(
-        'VALIDATION_ERROR',
-        'Invalid delimiter for addText - expected a string',
       );
     }
 
