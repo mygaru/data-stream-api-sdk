@@ -28,11 +28,11 @@ await window.DataStreamApiClient.setText("destinations_of_interest", "France,Gre
 await dsClient.setText("destinations_of_interest", "France,Greece"); 
 
  ```
-- **`addText(name, value, delimeter)`** — adds a specified text to the column identified by the parameter name; **`value`** is attribute in a text format and **`"delimiter"`** - parameter defines how values are separated in a text column.
+- **`addText(name, value)`** — adds a specified text to the column identified by the parameter name; **`value`** is attribute in a text format.
 
-- For example, calling **`addText("destinations_of_interest", "Thailand", ",")`** will update the column so that if it already contains "France,Greece", the resulting value becomes "France,Greece,Thailand".
+- For example, calling **`addText("destinations_of_interest", "Thailand")`** will update the column so that if it already contains "France,Greece", the resulting value becomes "France,Greece,Thailand".
 ```typescript
-await dsClient.addText("destinations_of_interest", "Thailand", ","); 
+await dsClient.addText("destinations_of_interest", "Thailand"); 
  ```
 
 ### Numeric operations
