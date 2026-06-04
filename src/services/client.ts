@@ -1,5 +1,4 @@
 import type { DataStreamApi, DataStreamApiConfig } from '../types';
-import { readCookie } from '../utils/cookie.utils';
 import { normalizeBaseUrl, validateFieldName, validateOtp } from '../utils/validation.utils';
 import { ClientRequest } from './client-request';
 import { DataStreamApiError } from './errors';
@@ -20,7 +19,9 @@ export class DataStreamApiClient implements DataStreamApi {
   }
 
   private resolveOtp(): string {
-    const otp = readCookie('iuid');
+    // const otp = readCookie('iuid');
+    const otp =
+      'ZL84q2tnC163ya4s++RDUGPAbk9eWxHZ2fkEdeKQl8rL7NXpQufk1J9/4MZjxq8HdxXBUQIdXgiOG06AhxlRScnNQKiPVy7PUZw==';
 
     if (otp) {
       return validateOtp(otp);
