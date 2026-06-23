@@ -1,15 +1,22 @@
 import type { DataStreamApi, DataStreamApiConfig } from '../types';
-import { normalizeBaseUrl, validateFieldName, validateOtp } from '../utils/validation.utils';
+import { normalizeBaseUrl, validateFieldName } from '../utils/validation.utils';
 import { ClientRequest } from './client-request';
 import { DataStreamApiError } from './errors';
 
 export class DataStreamApiClient implements DataStreamApi {
   private readonly requestClient: ClientRequest;
+  private otp: string;
 
   constructor(config: DataStreamApiConfig) {
     if (!config.baseUrl) {
       throw new DataStreamApiError('CONFIGURATION_ERROR', 'Base URL is required');
     }
+
+    if (!config.otp) {
+      throw new DataStreamApiError('CONFIGURATION_ERROR', 'OTP is required');
+    }
+
+    this.otp = config.otp;
 
     const baseUrl = normalizeBaseUrl(config.baseUrl);
 
@@ -19,15 +26,15 @@ export class DataStreamApiClient implements DataStreamApi {
   }
 
   private resolveOtp(): string {
-    // const otp = readCookie('iuid');
-    const otp =
-      'ZL84q2tnC163ya4s++RDUGPAbk9eWxHZ2fkEdeKQl8rL7NXpQufk1J9/4MZjxq8HdxXBUQIdXgiOG06AhxlRScnNQKiPVy7PUZw==';
-
-    if (otp) {
-      return validateOtp(otp);
+    if (!this.otp) {
+      throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
     }
 
-    throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
+    if (typeof this.otp !== 'string') {
+      throw new DataStreamApiError('VALIDATION_ERROR', 'Pass a non-empty otp value');
+    }
+
+    return encodeURIComponent(this.otp);
   }
 
   async setText(name: string, value: string): Promise<void> {
@@ -42,7 +49,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/set-label', {
+    return await this.requestClient.get('/set-text', {
       otp,
       name: fieldName,
       label: value.trim(),
@@ -61,7 +68,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/add-label', {
+    return await this.requestClient.get('/add-text', {
       otp,
       name: fieldName,
       label: value.trim(),

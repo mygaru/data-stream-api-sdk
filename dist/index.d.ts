@@ -14,6 +14,7 @@ declare class DataStreamApiError extends Error {
 
 interface DataStreamApiConfig {
     baseUrl: string;
+    otp: string;
 }
 
 interface BrowserDataStreamApi extends DataStreamApi {
@@ -28,6 +29,7 @@ declare global {
 
 declare class DataStreamApiClient implements DataStreamApi {
     private readonly requestClient;
+    private otp;
     constructor(config: DataStreamApiConfig);
     private resolveOtp;
     setText(name: string, value: string): Promise<void>;

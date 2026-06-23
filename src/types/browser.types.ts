@@ -8,8 +8,10 @@ export interface BrowserDataStreamApi extends DataStreamApi {
   Error: typeof DataStreamApiError;
 }
 
-export type CommandQueueEntry = ArrayLike<unknown>;
-export type CommandQueue = { q?: CommandQueueEntry[] };
+export type CmdCallback = () => void;
+export type CommandQueue = { cmd: CmdCallback[] };
+
+export type MyGaruOtp = { id: string };
 
 declare global {
   interface Window {
