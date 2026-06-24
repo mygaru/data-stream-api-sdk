@@ -6,7 +6,7 @@ The Data Stream API SDK works in conjunction with the **myGaru Ident** SDK. Iden
 
 ```
 1. myGaruStandalone.js loads → mygaru.init(partnerId)
-2. app.ident() → GET https://ident.mygaru.com/v2/id?partner_id={partnerId}
+2. app.identV2() → GET https://ident.mygaru.com/v2/id
 3. Response: { otp: "..." }
 4. saveCachedId(otp) → localStorage.setItem("myg_otp", JSON.stringify({ id: otp, ts: Date.now() }))
 5. dsa.global.js loads → polls for OTP in cookie (iuid) or localStorage (myg_otp)
@@ -28,8 +28,8 @@ The Data Stream API SDK works in conjunction with the **myGaru Ident** SDK. Iden
       var mygaru = window.mygaru || {};
       mygaru.cmd = mygaru.cmd || [];
       mygaru.cmd.push(function () {
-        var app = mygaru.init('YOUR_PARTNER_ID');
-        app.ident({ timeout: 1000, cacheTTL: 7 * 24 * 60 * 60 * 1000 }).then(function (id) {
+        var app = mygaru.init();
+        app.identV2({ timeout: 1000, cacheTTL: 7 * 24 * 60 * 60 * 1000, emitSecureSignals: true }).then(function (id) {
           console.log('myGaru ID resolved:', id);
         });
       });
@@ -65,7 +65,7 @@ The Data Stream API SDK works in conjunction with the **myGaru Ident** SDK. Iden
 ### myGaru Ident (`myGaruStandalone.js`)
 
 1. `mygaru.init(partnerId)` creates a partner context
-2. `app.ident(opts)` calls `GET https://ident.mygaru.com/v2/id?partner_id={partnerId}` with credentials
+2. `app.identV2(opts)` calls `GET https://ident.mygaru.com/v2/id` with credentials
 3. On success, stores the OTP in localStorage:
    ```javascript
    localStorage.setItem("myg_otp", JSON.stringify({ id: otp, ts: Date.now() }));
