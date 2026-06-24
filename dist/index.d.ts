@@ -29,9 +29,12 @@ declare global {
 
 declare class DataStreamApiClient implements DataStreamApi {
     private readonly requestClient;
+    private cachedOtp;
     constructor(config: DataStreamApiConfig);
+    probeOtp(): string | null;
+    lockOtp(otp: string): void;
     private resolveOtp;
-    private readCachedOtp;
+    private readLocalStorageOtp;
     setText(name: string, value: string): Promise<void>;
     addText(name: string, value: string): Promise<void>;
     setNum(name: string, value: number): Promise<void>;

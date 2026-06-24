@@ -6,6 +6,7 @@ import { DataStreamApiError } from './errors';
 
 export class DataStreamApiClient implements DataStreamApi {
   private readonly requestClient: ClientRequest;
+  private cachedOtp: string | null = null;
 
   constructor(config: DataStreamApiConfig) {
     if (!config.baseUrl) {
@@ -19,21 +20,21 @@ export class DataStreamApiClient implements DataStreamApi {
     });
   }
 
-  private resolveOtp(): string {
-    const otp = readCookie('iuid') ?? this.readCachedOtp();
-
-    if (otp) {
-      const isValidOtp = validateOtp(otp);
-
-      if (isValidOtp) {
-        return encodeURIComponent(otp);
-      }
-    }
-
-    throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
+  probeOtp(): string | null {
+    return readCookie('iuid') ?? this.readLocalStorageOtp() ?? null;
   }
 
-  private readCachedOtp(): string | undefined {
+  lockOtp(otp: string): void {
+    validateOtp(otp);
+    this.cachedOtp = encodeURIComponent(otp);
+  }
+
+  private resolveOtp(): string {
+    if (this.cachedOtp) return this.cachedOtp;
+    throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is not resolved');
+  }
+
+  private readLocalStorageOtp(): string | undefined {
     const weekMs = 7 * 24 * 60 * 60 * 1000;
     try {
       const raw = globalThis.localStorage?.getItem('myg_otp');

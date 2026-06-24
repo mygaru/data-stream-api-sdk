@@ -1,6 +1,7 @@
 import { DataStreamApiClient } from './services/client';
 import { DataStreamApiError } from './services/errors';
 import type { BrowserDataStreamApi } from './types';
+import { friendlyInterval } from './utils/friendly-interval';
 
 let instance: DataStreamApiClient | null = null;
 let resolveReady: (client: DataStreamApiClient) => void;
@@ -8,10 +9,7 @@ const ready = new Promise<DataStreamApiClient>((resolve) => {
   resolveReady = resolve;
 });
 
-const getClient = (): Promise<DataStreamApiClient> => {
-  if (instance) return Promise.resolve(instance);
-  return ready;
-};
+const getClient = (): Promise<DataStreamApiClient> => ready;
 
 const execCmd = (...callbacks: Array<() => void>): number => {
   for (const cb of callbacks) {
@@ -26,11 +24,38 @@ const execCmd = (...callbacks: Array<() => void>): number => {
   return callbacks.length;
 };
 
+const OTP_POLL_INTERVAL_MS = 100;
+const OTP_POLL_TIMEOUT_MS = 60_000;
+
 const browserDataStreamApiClient: BrowserDataStreamApi = {
   cmd: [],
   init(config) {
     instance = new DataStreamApiClient(config);
-    resolveReady(instance);
+
+    const otp = instance.probeOtp();
+    if (otp) {
+      instance.lockOtp(otp);
+      resolveReady(instance);
+    } else {
+      const { promise } = friendlyInterval(
+        () => !!instance?.probeOtp(),
+        OTP_POLL_INTERVAL_MS,
+        OTP_POLL_TIMEOUT_MS,
+      );
+
+      promise.then((found) => {
+        if (found && instance) {
+          const otp = instance.probeOtp();
+          if (otp) {
+            instance.lockOtp(otp);
+            resolveReady(instance);
+          }
+        } else {
+          console.error('[DataStreamApiClient] OTP not found within 60s');
+        }
+      });
+    }
+
     return instance;
   },
   async setText(name, value) {
