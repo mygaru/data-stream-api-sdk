@@ -1,6 +1,6 @@
 {
   "name": "@mygaru/data-stream-api-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "myGaru Data Stream API integration",
   "type": "module",
   "main": "./dist/index.js",
