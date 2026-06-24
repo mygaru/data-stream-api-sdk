@@ -5,16 +5,16 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "browser": "./dist/browser.global.js",
-  "unpkg": "./dist/browser.global.js",
-  "jsdelivr": "./dist/browser.global.js",
+  "browser": "./dist/dsa.global.js",
+  "unpkg": "./dist/dsa.global.js",
+  "jsdelivr": "./dist/dsa.global.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./browser.global.js": "./dist/browser.global.js"
+    "./dsa.global.js": "./dist/dsa.global.js"
   },
   "sideEffects": false,
   "files": ["dist"],

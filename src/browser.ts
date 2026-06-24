@@ -1,83 +1,74 @@
 import { DataStreamApiClient } from './services/client';
 import { DataStreamApiError } from './services/errors';
-import type { BrowserDataStreamApi, CommandQueue, CommandQueueEntry } from './types';
+import type { BrowserDataStreamApi } from './types';
 
 let instance: DataStreamApiClient | null = null;
+let resolveReady: (client: DataStreamApiClient) => void;
+const ready = new Promise<DataStreamApiClient>((resolve) => {
+  resolveReady = resolve;
+});
 
-const replayQueue = (queue: CommandQueueEntry[]): void => {
-  const sdkRecord = browserDataStreamApiClient as unknown as Record<
-    string,
-    ((...rest: unknown[]) => unknown) | unknown
-  >;
-
-  for (const entry of queue) {
-    const [methodName, ...args] = Array.from(entry as ArrayLike<unknown>);
-    const handler = sdkRecord[methodName as string];
-
-    try {
-      if (typeof handler !== 'function') {
-        throw new DataStreamApiError(
-          'VALIDATION_ERROR',
-          `Unknown DataStreamApiClient method: "${String(methodName)}"`,
-        );
-      }
-
-      (handler as (...rest: unknown[]) => unknown).apply(browserDataStreamApiClient, args);
-    } catch (err) {
-      console.error('[DataStreamApiClient] queued call failed:', err);
-    }
-  }
+const getClient = (): Promise<DataStreamApiClient> => {
+  if (instance) return Promise.resolve(instance);
+  return ready;
 };
 
-const getDataStreamApiClient = (): DataStreamApiClient => {
-  if (!instance) {
-    throw new DataStreamApiError('CONFIGURATION_ERROR', 'DataStreamApiClient is not initialized');
+const execCmd = (...callbacks: Array<() => void>): number => {
+  for (const cb of callbacks) {
+    try {
+      if (typeof cb === 'function') {
+        cb();
+      }
+    } catch (err) {
+      console.error('[DataStreamApiClient] command failed:', err);
+    }
   }
-
-  return instance;
+  return callbacks.length;
 };
 
 const browserDataStreamApiClient: BrowserDataStreamApi = {
+  cmd: [],
   init(config) {
     instance = new DataStreamApiClient(config);
+    resolveReady(instance);
 
-    const queue = (browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue).q;
-
-    if (Array.isArray(queue) && queue.length > 0) {
-      (browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue).q = [];
-
-      replayQueue(queue);
+    const { cmd } = browserDataStreamApiClient;
+    for (let i = 0; i < cmd.length; i++) {
+      execCmd(cmd[i]);
     }
+    cmd.length = 0;
+    cmd.push = execCmd;
 
     return instance;
   },
-  setText(name, value) {
-    return getDataStreamApiClient().setText(name, value);
+  async setText(name, value) {
+    const client = await getClient();
+    return client.setText(name, value);
   },
-  addText(name, value) {
-    return getDataStreamApiClient().addText(name, value);
+  async addText(name, value) {
+    const client = await getClient();
+    return client.addText(name, value);
   },
-  setNum(name, value) {
-    return getDataStreamApiClient().setNum(name, value);
+  async setNum(name, value) {
+    const client = await getClient();
+    return client.setNum(name, value);
   },
-  stepNum(name, step) {
-    return getDataStreamApiClient().stepNum(name, step);
+  async stepNum(name, step) {
+    const client = await getClient();
+    return client.stepNum(name, step);
   },
-  setBool(name, value) {
-    return getDataStreamApiClient().setBool(name, value);
+  async setBool(name, value) {
+    const client = await getClient();
+    return client.setBool(name, value);
   },
   Error: DataStreamApiError,
 };
 
 if (typeof window !== 'undefined') {
-  const existing = window.DataStreamApiClient as (BrowserDataStreamApi & CommandQueue) | undefined;
-  const queue = existing?.q;
-  const client = browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue;
-
-  window.DataStreamApiClient = client;
-
-  if (Array.isArray(queue)) {
-    client.q = queue;
+  const pending = (window.DataStreamApiClient as { cmd?: Array<() => void> } | undefined)?.cmd;
+  window.DataStreamApiClient = browserDataStreamApiClient;
+  if (Array.isArray(pending)) {
+    browserDataStreamApiClient.cmd = pending;
   }
 }
 

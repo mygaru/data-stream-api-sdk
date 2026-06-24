@@ -17,6 +17,7 @@ interface DataStreamApiConfig {
 }
 
 interface BrowserDataStreamApi extends DataStreamApi {
+    cmd: Array<() => void>;
     init(config: DataStreamApiConfig): DataStreamApiClient;
     Error: typeof DataStreamApiError;
 }

@@ -14,7 +14,7 @@ export default defineConfig([
   {
     tsconfig: 'tsconfig.build.json',
     sourcemap: true,
-    entry: { browser: 'src/browser.ts' },
+    entry: { dsa: 'src/browser.ts' },
     format: ['iife'],
     platform: 'browser',
     clean: false,
