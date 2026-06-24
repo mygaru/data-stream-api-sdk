@@ -29,7 +29,7 @@ The Data Stream API SDK works in conjunction with the **myGaru Ident** SDK. Iden
       mygaru.cmd = mygaru.cmd || [];
       mygaru.cmd.push(function () {
         var app = mygaru.init();
-        app.identV2({ timeout: 1000, cacheTTL: 7 * 24 * 60 * 60 * 1000, emitSecureSignals: true }).then(function (id) {
+        app.identV2({ timeout: 1000, cacheTTL: 7 * 24 * 60 * 60 * 1000 }).then(function (id) {
           console.log('myGaru ID resolved:', id);
         });
       });
