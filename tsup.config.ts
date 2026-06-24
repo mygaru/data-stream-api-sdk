@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'tsup';
+
+const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
 export default defineConfig([
   {
@@ -20,5 +23,6 @@ export default defineConfig([
     clean: false,
     target: 'es2020',
     outDir: 'dist',
+    banner: { js: `/* @mygaru/data-stream-api-sdk v${version} */` },
   },
 ]);
