@@ -6,22 +6,22 @@ The myGaru Data Stream API is a mechanism provided to myGaru partners for collec
 
 ## Init
 
-Add the loader snippet inside `<head>`. It creates the command queue, loads the SDK asynchronously, and calls `init` once the script is ready:
+Add the SDK script and initialize via the command queue:
 
 ```html
+<script async src="https://dsalib.mgaru.dev/dsa.global.js"></script>
 <script>
-(function(w,d,n,u,c){
-  w[n]=w[n]||{};w[n].cmd=w[n].cmd||[];
-  var e=d.createElement("script");e.async=true;e.src=u;
-  e.onload=function(){w[n].init(c);};
-  var f=d.getElementsByTagName("script")[0];f.parentNode.insertBefore(e,f);
-})(window,document,"DataStreamApiClient","https://dsalib.mgaru.dev/dsa.global.js",{baseUrl:"https://[client_id].signals.mygaru.com"});
+  var DataStreamApiClient = window.DataStreamApiClient || {};
+  DataStreamApiClient.cmd = DataStreamApiClient.cmd || [];
+  DataStreamApiClient.cmd.push(function () {
+    DataStreamApiClient.init({ baseUrl: "https://[client_id].signals.mygaru.com" });
+  });
 </script>
 ```
 
-## Quick start
+Commands pushed before the SDK loads are queued and executed in order once the script is ready. Commands pushed after load execute immediately.
 
-All SDK calls should be wrapped in `cmd.push`. Commands pushed before `init` are queued and executed in order once the SDK is ready. Commands pushed after `init` execute immediately.
+## Quick start
 
 ```javascript
 DataStreamApiClient.cmd.push(function () {

@@ -31,14 +31,6 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
   init(config) {
     instance = new DataStreamApiClient(config);
     resolveReady(instance);
-
-    const { cmd } = browserDataStreamApiClient;
-    for (let i = 0; i < cmd.length; i++) {
-      execCmd(cmd[i]);
-    }
-    cmd.length = 0;
-    cmd.push = execCmd;
-
     return instance;
   },
   async setText(name, value) {
@@ -66,9 +58,14 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
 
 if (typeof window !== 'undefined') {
   const pending = (window.DataStreamApiClient as { cmd?: Array<() => void> } | undefined)?.cmd;
+
   window.DataStreamApiClient = browserDataStreamApiClient;
+  browserDataStreamApiClient.cmd.push = execCmd;
+
   if (Array.isArray(pending)) {
-    browserDataStreamApiClient.cmd = pending;
+    for (let i = 0; i < pending.length; i++) {
+      execCmd(pending[i]);
+    }
   }
 }
 
