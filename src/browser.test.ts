@@ -41,9 +41,11 @@ describe('command queue', () => {
     expect(urls[0]).toContain('/data-stream/set-boolean');
     expect(urls[0]).toContain('name=abandonedcart');
     expect(urls[0]).toContain('value=true');
+    expect(urls[0]).toContain(`otp=${encodeURIComponent(TEST_OTP)}`);
 
     expect(urls[1]).toContain('/data-stream/set-number');
     expect(urls[1]).toContain('name=carttotal');
     expect(urls[1]).toContain('value=42');
+    expect(urls[1]).toContain(`otp=${encodeURIComponent(TEST_OTP)}`);
   });
 });
