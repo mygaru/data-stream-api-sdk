@@ -17,11 +17,14 @@
     "./dsa.global.js": "./dist/dsa.global.js"
   },
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
+    "test": "vitest run",
     "build": "tsup --minify",
     "lint": "biome check src --write",
     "clean": "rm -rf dist",
@@ -42,6 +45,7 @@
     "commitlint-plugin-regex-match": "1.2.4",
     "husky": "^9.1.7",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
