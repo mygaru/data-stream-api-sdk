@@ -8,7 +8,6 @@ export function friendlyInterval(
   intervalMs: number,
   timeoutMs: number,
 ): FriendlyIntervalHandle {
-  let rafId = 0;
   let intervalId: ReturnType<typeof setInterval> | 0 = 0;
   let settled = false;
 
@@ -17,22 +16,19 @@ export function friendlyInterval(
       if (settled) return;
       settled = true;
       if (intervalId) clearInterval(intervalId);
-      cancelAnimationFrame(rafId);
       resolve(result);
     };
 
     const start = Date.now();
 
     intervalId = setInterval(() => {
-      rafId = requestAnimationFrame(() => {
-        if (check()) {
-          done(true);
-          return;
-        }
-        if (Date.now() - start >= timeoutMs) {
-          done(false);
-        }
-      });
+      if (check()) {
+        done(true);
+        return;
+      }
+      if (Date.now() - start >= timeoutMs) {
+        done(false);
+      }
     }, intervalMs);
   });
 
@@ -40,7 +36,6 @@ export function friendlyInterval(
     if (settled) return;
     settled = true;
     if (intervalId) clearInterval(intervalId);
-    cancelAnimationFrame(rafId);
   };
 
   return { promise, cancel };

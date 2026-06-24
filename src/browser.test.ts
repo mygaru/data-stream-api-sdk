@@ -11,8 +11,6 @@ describe('command queue', () => {
     vi.resetModules();
     fetchSpy.mockClear();
     vi.stubGlobal('fetch', fetchSpy);
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(cb, 0));
-    vi.stubGlobal('cancelAnimationFrame', clearTimeout);
     pending = [];
     vi.stubGlobal('window', { DataStreamApiClient: { cmd: pending } });
   });
