@@ -23,7 +23,11 @@ export class DataStreamApiClient implements DataStreamApi {
     const otp = readCookie('iuid') ?? this.readCachedOtp();
 
     if (otp) {
-      return validateOtp(otp);
+      const isValidOtp = validateOtp(otp);
+
+      if (isValidOtp) {
+        return encodeURIComponent(otp);
+      }
     }
 
     throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
@@ -56,7 +60,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/set-label', {
+    return await this.requestClient.get('/set-text', {
       otp,
       name: fieldName,
       label: value.trim(),
@@ -75,7 +79,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/add-label', {
+    return await this.requestClient.get('/add-text', {
       otp,
       name: fieldName,
       label: value.trim(),
