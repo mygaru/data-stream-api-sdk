@@ -20,7 +20,7 @@ export class DataStreamApiClient implements DataStreamApi {
   }
 
   private resolveOtp(): string {
-    const otp = readCookie('iuid') ?? this.readLocalStorageOtp();
+    const otp = readCookie('iuid') ?? this.readCachedOtp();
 
     if (otp) {
       return validateOtp(otp);
@@ -29,9 +29,16 @@ export class DataStreamApiClient implements DataStreamApi {
     throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
   }
 
-  private readLocalStorageOtp(): string | undefined {
+  private readCachedOtp(): string | undefined {
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
     try {
-      return globalThis.localStorage?.getItem('iuid') ?? undefined;
+      const raw = globalThis.localStorage?.getItem('myg_otp');
+      if (!raw) return undefined;
+
+      const entry: { id: string; ts: number } = JSON.parse(raw);
+      if (!entry.id || Date.now() - entry.ts > weekMs) return undefined;
+
+      return entry.id;
     } catch {
       return undefined;
     }

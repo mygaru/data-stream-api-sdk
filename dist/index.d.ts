@@ -31,7 +31,7 @@ declare class DataStreamApiClient implements DataStreamApi {
     private readonly requestClient;
     constructor(config: DataStreamApiConfig);
     private resolveOtp;
-    private readLocalStorageOtp;
+    private readCachedOtp;
     setText(name: string, value: string): Promise<void>;
     addText(name: string, value: string): Promise<void>;
     setNum(name: string, value: number): Promise<void>;
