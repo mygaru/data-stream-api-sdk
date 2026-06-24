@@ -7,7 +7,7 @@ OTP absence is a **stop factor**. The SDK must not send any requests until a val
 1. Cookie `iuid`
 2. localStorage `myg_otp` (JSON `{id, ts, carrier}`, 1 week TTL)
 
-If neither source yields a value, the SDK polls via `friendlyInterval` (100ms inside `requestAnimationFrame`, 60s timeout). The queue remains blocked until OTP is found.
+If neither source yields  a value, the SDK polls via `friendlyInterval` (100ms inside, 60s timeout). The queue remains blocked until OTP is found.
 
 OTP is resolved **once** per session and cached — it must not change mid-session.
 
