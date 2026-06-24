@@ -20,12 +20,19 @@ export class DataStreamApiClient implements DataStreamApi {
     });
   }
 
-  probeOtp(): string | null {
-    return readCookie('iuid') ?? this.readLocalStorageOtp() ?? null;
+  probeOtp(): { id: string; carrier?: string } | null {
+    const cookieId = readCookie('iuid');
+
+    const storageOtp = this.readLocalStorageOtp();
+
+    if (cookieId) return { id: cookieId, carrier: storageOtp?.carrier };
+
+    return storageOtp ?? null;
   }
 
   lockOtp(otp: string): void {
     validateOtp(otp);
+
     this.cachedOtp = encodeURIComponent(otp);
   }
 
@@ -34,16 +41,18 @@ export class DataStreamApiClient implements DataStreamApi {
     throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is not resolved');
   }
 
-  private readLocalStorageOtp(): string | undefined {
+  private readLocalStorageOtp(): { id: string; carrier: string } | undefined {
     const weekMs = 7 * 24 * 60 * 60 * 1000;
+
     try {
       const raw = globalThis.localStorage?.getItem('myg_otp');
       if (!raw) return undefined;
 
-      const entry: { id: string; ts: number } = JSON.parse(raw);
+      const entry: { id: string; ts: number; carrier: string } = JSON.parse(raw);
+
       if (!entry.id || Date.now() - entry.ts > weekMs) return undefined;
 
-      return entry.id;
+      return { id: entry.id, carrier: entry.carrier };
     } catch {
       return undefined;
     }

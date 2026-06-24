@@ -31,7 +31,10 @@ declare class DataStreamApiClient implements DataStreamApi {
     private readonly requestClient;
     private cachedOtp;
     constructor(config: DataStreamApiConfig);
-    probeOtp(): string | null;
+    probeOtp(): {
+        id: string;
+        carrier?: string;
+    } | null;
     lockOtp(otp: string): void;
     private resolveOtp;
     private readLocalStorageOtp;
