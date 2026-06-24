@@ -1,4 +1,5 @@
 import type { DataStreamApi, DataStreamApiConfig } from '../types';
+import { readCookie } from '../utils/cookie.utils';
 import { normalizeBaseUrl, validateFieldName, validateOtp } from '../utils/validation.utils';
 import { ClientRequest } from './client-request';
 import { DataStreamApiError } from './errors';
@@ -19,15 +20,21 @@ export class DataStreamApiClient implements DataStreamApi {
   }
 
   private resolveOtp(): string {
-    // const otp = readCookie('iuid');
-    const otp =
-      'ZL84q2tnC163ya4s++RDUGPAbk9eWxHZ2fkEdeKQl8rL7NXpQufk1J9/4MZjxq8HdxXBUQIdXgiOG06AhxlRScnNQKiPVy7PUZw==';
+    const otp = readCookie('iuid') ?? this.readLocalStorageOtp();
 
     if (otp) {
       return validateOtp(otp);
     }
 
     throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
+  }
+
+  private readLocalStorageOtp(): string | undefined {
+    try {
+      return globalThis.localStorage?.getItem('iuid') ?? undefined;
+    } catch {
+      return undefined;
+    }
   }
 
   async setText(name: string, value: string): Promise<void> {
