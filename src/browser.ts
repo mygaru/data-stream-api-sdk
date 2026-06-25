@@ -1,83 +1,105 @@
 import { DataStreamApiClient } from './services/client';
 import { DataStreamApiError } from './services/errors';
-import type { BrowserDataStreamApi, CommandQueue, CommandQueueEntry } from './types';
+import type { BrowserDataStreamApi } from './types';
+import { friendlyInterval } from './utils/friendly-interval';
+
+const GUEST_CARRIER = '00000000-0000-0000-0000-000000000000';
 
 let instance: DataStreamApiClient | null = null;
+let resolveReady: (client: DataStreamApiClient) => void;
+const ready = new Promise<DataStreamApiClient>((resolve) => {
+  resolveReady = resolve;
+});
 
-const replayQueue = (queue: CommandQueueEntry[]): void => {
-  const sdkRecord = browserDataStreamApiClient as unknown as Record<
-    string,
-    ((...rest: unknown[]) => unknown) | unknown
-  >;
+const getClient = (): Promise<DataStreamApiClient> => ready;
 
-  for (const entry of queue) {
-    const [methodName, ...args] = Array.from(entry as ArrayLike<unknown>);
-    const handler = sdkRecord[methodName as string];
-
+const execCmd = (...callbacks: Array<() => void>): number => {
+  for (const cb of callbacks) {
     try {
-      if (typeof handler !== 'function') {
-        throw new DataStreamApiError(
-          'VALIDATION_ERROR',
-          `Unknown DataStreamApiClient method: "${String(methodName)}"`,
-        );
+      if (typeof cb === 'function') {
+        cb();
       }
-
-      (handler as (...rest: unknown[]) => unknown).apply(browserDataStreamApiClient, args);
     } catch (err) {
-      console.error('[DataStreamApiClient] queued call failed:', err);
+      console.error('[DataStreamApiClient] command failed:', err);
     }
   }
+  return callbacks.length;
 };
 
-const getDataStreamApiClient = (): DataStreamApiClient => {
-  if (!instance) {
-    throw new DataStreamApiError('CONFIGURATION_ERROR', 'DataStreamApiClient is not initialized');
-  }
-
-  return instance;
-};
+const OTP_POLL_INTERVAL_MS = 100;
+const OTP_POLL_TIMEOUT_MS = 60_000;
 
 const browserDataStreamApiClient: BrowserDataStreamApi = {
+  cmd: [],
   init(config) {
     instance = new DataStreamApiClient(config);
 
-    const queue = (browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue).q;
+    const otp = instance.probeOtp();
 
-    if (Array.isArray(queue) && queue.length > 0) {
-      (browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue).q = [];
+    if (otp && otp.carrier !== GUEST_CARRIER) {
+      instance.lockOtp(otp.id);
+      resolveReady(instance);
+    } else {
+      const { promise } = friendlyInterval(
+        () => !!instance?.probeOtp(),
+        OTP_POLL_INTERVAL_MS,
+        OTP_POLL_TIMEOUT_MS,
+      );
 
-      replayQueue(queue);
+      promise.then((found) => {
+        if (found && instance) {
+          const otp = instance.probeOtp();
+
+          if (otp && otp.carrier !== GUEST_CARRIER) {
+            instance.lockOtp(otp.id);
+            resolveReady(instance);
+          }
+        } else {
+          console.error('[DataStreamApiClient] OTP not found within 60s');
+        }
+      });
     }
 
     return instance;
   },
-  setText(name, value) {
-    return getDataStreamApiClient().setText(name, value);
+  async setText(name, value) {
+    const client = await getClient();
+
+    return client.setText(name, value);
   },
-  addText(name, value) {
-    return getDataStreamApiClient().addText(name, value);
+  async addText(name, value) {
+    const client = await getClient();
+
+    return client.addText(name, value);
   },
-  setNum(name, value) {
-    return getDataStreamApiClient().setNum(name, value);
+  async setNum(name, value) {
+    const client = await getClient();
+
+    return client.setNum(name, value);
   },
-  stepNum(name, step) {
-    return getDataStreamApiClient().stepNum(name, step);
+  async stepNum(name, step) {
+    const client = await getClient();
+
+    return client.stepNum(name, step);
   },
-  setBool(name, value) {
-    return getDataStreamApiClient().setBool(name, value);
+  async setBool(name, value) {
+    const client = await getClient();
+
+    return client.setBool(name, value);
   },
   Error: DataStreamApiError,
 };
 
 if (typeof window !== 'undefined') {
-  const existing = window.DataStreamApiClient as (BrowserDataStreamApi & CommandQueue) | undefined;
-  const queue = existing?.q;
-  const client = browserDataStreamApiClient as BrowserDataStreamApi & CommandQueue;
+  const pending = (window.DataStreamApiClient as { cmd?: Array<() => void> } | undefined)?.cmd;
 
-  window.DataStreamApiClient = client;
+  window.DataStreamApiClient = browserDataStreamApiClient;
+  browserDataStreamApiClient.cmd.push = execCmd;
 
-  if (Array.isArray(queue)) {
-    client.q = queue;
+  if (Array.isArray(pending)) {
+    for (let i = 0; i < pending.length; i++) {
+      execCmd(pending[i]);
+    }
   }
 }
 

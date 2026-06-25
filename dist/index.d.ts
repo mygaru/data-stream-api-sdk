@@ -17,6 +17,7 @@ interface DataStreamApiConfig {
 }
 
 interface BrowserDataStreamApi extends DataStreamApi {
+    cmd: Array<() => void>;
     init(config: DataStreamApiConfig): DataStreamApiClient;
     Error: typeof DataStreamApiError;
 }
@@ -28,8 +29,15 @@ declare global {
 
 declare class DataStreamApiClient implements DataStreamApi {
     private readonly requestClient;
+    private cachedOtp;
     constructor(config: DataStreamApiConfig);
+    probeOtp(): {
+        id: string;
+        carrier?: string;
+    } | null;
+    lockOtp(otp: string): void;
     private resolveOtp;
+    private readLocalStorageOtp;
     setText(name: string, value: string): Promise<void>;
     addText(name: string, value: string): Promise<void>;
     setNum(name: string, value: number): Promise<void>;

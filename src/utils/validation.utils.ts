@@ -12,7 +12,7 @@ export const normalizeBaseUrl = (url: string): string => {
   return baseUrl.replace(/\/+$/, '');
 };
 
-export const validateOtp = (value: string): string => {
+export const validateOtp = (value: string): boolean => {
   if (typeof value !== 'string') {
     throw new DataStreamApiError('VALIDATION_ERROR', 'Pass a non-empty otp value');
   }
@@ -22,7 +22,7 @@ export const validateOtp = (value: string): string => {
     throw new DataStreamApiError('VALIDATION_ERROR', 'Pass a non-empty otp value');
   }
 
-  return trimmed;
+  return !!trimmed.length;
 };
 
 export const validateFieldName = (name: string): string => {

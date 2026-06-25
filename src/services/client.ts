@@ -1,10 +1,12 @@
 import type { DataStreamApi, DataStreamApiConfig } from '../types';
+import { readCookie } from '../utils/cookie.utils';
 import { normalizeBaseUrl, validateFieldName, validateOtp } from '../utils/validation.utils';
 import { ClientRequest } from './client-request';
 import { DataStreamApiError } from './errors';
 
 export class DataStreamApiClient implements DataStreamApi {
   private readonly requestClient: ClientRequest;
+  private cachedOtp: string | null = null;
 
   constructor(config: DataStreamApiConfig) {
     if (!config.baseUrl) {
@@ -18,16 +20,42 @@ export class DataStreamApiClient implements DataStreamApi {
     });
   }
 
+  probeOtp(): { id: string; carrier?: string } | null {
+    const cookieId = readCookie('iuid');
+
+    const storageOtp = this.readLocalStorageOtp();
+
+    if (cookieId) return { id: cookieId, carrier: storageOtp?.carrier };
+
+    return storageOtp ?? null;
+  }
+
+  lockOtp(otp: string): void {
+    validateOtp(otp);
+
+    this.cachedOtp = encodeURIComponent(otp);
+  }
+
   private resolveOtp(): string {
-    // const otp = readCookie('iuid');
-    const otp =
-      'ZL84q2tnC163ya4s++RDUGPAbk9eWxHZ2fkEdeKQl8rL7NXpQufk1J9/4MZjxq8HdxXBUQIdXgiOG06AhxlRScnNQKiPVy7PUZw==';
+    if (this.cachedOtp) return this.cachedOtp;
+    throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is not resolved');
+  }
 
-    if (otp) {
-      return validateOtp(otp);
+  private readLocalStorageOtp(): { id: string; carrier: string } | undefined {
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+    try {
+      const raw = globalThis.localStorage?.getItem('myg_otp');
+      if (!raw) return undefined;
+
+      const entry: { id: string; ts: number; carrier: string } = JSON.parse(raw);
+
+      if (!entry.id || Date.now() - entry.ts > weekMs) return undefined;
+
+      return { id: entry.id, carrier: entry.carrier };
+    } catch {
+      return undefined;
     }
-
-    throw new DataStreamApiError('VALIDATION_ERROR', 'OTP is required');
   }
 
   async setText(name: string, value: string): Promise<void> {
@@ -42,7 +70,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/set-label', {
+    return await this.requestClient.get('/set-text', {
       otp,
       name: fieldName,
       label: value.trim(),
@@ -61,7 +89,7 @@ export class DataStreamApiClient implements DataStreamApi {
 
     const otp = this.resolveOtp();
 
-    return await this.requestClient.get('/add-label', {
+    return await this.requestClient.get('/add-text', {
       otp,
       name: fieldName,
       label: value.trim(),

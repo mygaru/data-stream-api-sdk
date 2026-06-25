@@ -4,12 +4,10 @@ import type { DataStreamApi } from './api.types';
 import type { DataStreamApiConfig } from './config.types';
 
 export interface BrowserDataStreamApi extends DataStreamApi {
+  cmd: Array<() => void>;
   init(config: DataStreamApiConfig): DataStreamApiClient;
   Error: typeof DataStreamApiError;
 }
-
-export type CommandQueueEntry = ArrayLike<unknown>;
-export type CommandQueue = { q?: CommandQueueEntry[] };
 
 declare global {
   interface Window {

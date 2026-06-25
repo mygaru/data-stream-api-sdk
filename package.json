@@ -1,27 +1,30 @@
 {
   "name": "@mygaru/data-stream-api-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "myGaru Data Stream API integration",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "browser": "./dist/browser.global.js",
-  "unpkg": "./dist/browser.global.js",
-  "jsdelivr": "./dist/browser.global.js",
+  "browser": "./dist/dsa.global.js",
+  "unpkg": "./dist/dsa.global.js",
+  "jsdelivr": "./dist/dsa.global.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./browser.global.js": "./dist/browser.global.js"
+    "./dsa.global.js": "./dist/dsa.global.js"
   },
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
+    "test": "vitest run",
     "build": "tsup --minify",
     "lint": "biome check src --write",
     "clean": "rm -rf dist",
@@ -42,6 +45,7 @@
     "commitlint-plugin-regex-match": "1.2.4",
     "husky": "^9.1.7",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
