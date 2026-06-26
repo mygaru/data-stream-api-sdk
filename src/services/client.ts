@@ -33,7 +33,7 @@ export class DataStreamApiClient implements DataStreamApi {
   lockOtp(otp: string): void {
     validateOtp(otp);
 
-    this.cachedOtp = encodeURIComponent(otp);
+    this.cachedOtp = otp;
   }
 
   private resolveOtp(): string {
