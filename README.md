@@ -48,7 +48,7 @@ yarn install
 ## Integration with myGaru Ident
 
 For the full browser setup (Ident SDK + Data Stream API), see [doc/integration.md](./doc/integration.md).  
-Ident SDK reference: [fe-ident-standalone/docs/integration.md](https://gitlab.adtelligent.com/mygaru/fe-ident-standalone/-/blob/main/docs/integration.md).
+Ident SDK reference: [fe-ident-standalone/docs/integration.md](https://github.com/mygaru/fe-ident-standalone/blob/main/docs/integration.md).
 
 **Two scripts on the partner site:**
 

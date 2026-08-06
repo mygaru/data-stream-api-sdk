@@ -3,8 +3,6 @@ import { DataStreamApiError } from './services/errors';
 import type { BrowserDataStreamApi } from './types';
 import { friendlyInterval } from './utils/friendly-interval';
 
-const GUEST_CARRIER = '00000000-0000-0000-0000-000000000000';
-
 let instance: DataStreamApiClient | null = null;
 let resolveReady: (client: DataStreamApiClient) => void;
 const ready = new Promise<DataStreamApiClient>((resolve) => {
@@ -36,7 +34,7 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
 
     const otp = instance.probeOtp();
 
-    if (otp?.id && otp.carrier && otp.carrier !== GUEST_CARRIER) {
+    if (otp?.id) {
       instance.lockOtp(otp.id);
       resolveReady(instance);
     } else {
@@ -50,7 +48,7 @@ const browserDataStreamApiClient: BrowserDataStreamApi = {
         if (found && instance) {
           const otp = instance.probeOtp();
 
-          if (otp?.id && otp.carrier && otp.carrier !== GUEST_CARRIER) {
+          if (otp?.id) {
             instance.lockOtp(otp.id);
             resolveReady(instance);
           }
