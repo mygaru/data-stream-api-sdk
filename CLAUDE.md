@@ -35,6 +35,7 @@ IIFE artifact is `dist/dsa.global.js` (served from `https://dsalib.mgaru.dev/dsa
 3. **`init()` called (via queue)**: creates client instance, probes OTP → if found, locks + resolves ready; if absent, polls via `friendlyInterval`
 4. **`ready` promise resolves**: all deferred method calls proceed, OTP is cached for the session
 
+
 ## Code Style
 
 - Linter: Biome (camelCase for locals, no `as any`)
